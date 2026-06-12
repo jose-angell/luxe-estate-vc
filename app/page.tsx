@@ -30,7 +30,7 @@ export default async function Page({
   const mapProperty = (p: any): Property => ({
     ...p,
     slug: p.slug || p.id,
-    images: p.images || (p.image ? [p.image] : ["https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80"]),
+    images: p.images && p.images.length > 0 ? p.images : ["https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80"],
   });
 
   const mappedFeatured = featuredProperties ? featuredProperties.map(mapProperty) : [];

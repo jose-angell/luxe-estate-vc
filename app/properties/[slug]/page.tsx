@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: PageProps) {
   if (!property) {
     const { data } = await supabase.from('properties').select('*').or(`slug.eq.${slug},id.eq.${slug}`).single();
     if (data) {
-      property = { ...data, slug: data.slug || data.id, images: data.images || (data.image ? [data.image] : []) } as Property;
+      property = { ...data, slug: data.slug || data.id, images: data.images || [] } as Property;
     }
   }
 
@@ -35,7 +35,7 @@ export default async function PropertyPage({ params }: PageProps) {
   if (!property) {
     const { data } = await supabase.from('properties').select('*').or(`slug.eq.${slug},id.eq.${slug}`).single();
     if (data) {
-      property = { ...data, slug: data.slug || data.id, images: data.images || (data.image ? [data.image] : []) } as Property;
+      property = { ...data, slug: data.slug || data.id, images: data.images || [] } as Property;
     }
   }
 
