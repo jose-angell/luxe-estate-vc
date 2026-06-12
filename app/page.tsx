@@ -27,10 +27,19 @@ export default async function Page({
     .eq('isFeatured', false)
     .range(start, end);
 
+  const mapProperty = (p: any): Property => ({
+    ...p,
+    slug: p.slug || p.id,
+    images: p.images || (p.image ? [p.image] : ["https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80"]),
+  });
+
+  const mappedFeatured = featuredProperties ? featuredProperties.map(mapProperty) : [];
+  const mappedMarket = marketProperties ? marketProperties.map(mapProperty) : [];
+
   return (
     <HomeClient 
-      featuredProperties={(featuredProperties as Property[]) || []} 
-      marketProperties={(marketProperties as Property[]) || []}
+      featuredProperties={mappedFeatured} 
+      marketProperties={mappedMarket}
       totalCount={count || 0}
       page={page}
       limit={limit}

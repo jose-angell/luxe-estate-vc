@@ -1,6 +1,7 @@
 "use client";
 
 import { Property } from "../data/mockProperties";
+import Link from "next/link";
 
 interface PropertyCardProps {
   property: Property;
@@ -22,17 +23,19 @@ export default function PropertyCard({
   }).format(property.price);
 
   return (
-    <article
-      className={`bg-white rounded-xl overflow-hidden shadow-card hover:shadow-soft transition-all duration-300 group cursor-pointer h-full flex flex-col ${className}`}
+    <Link
+      href={`/properties/${property.slug}`}
+      className={`bg-white rounded-xl overflow-hidden shadow-card hover:shadow-soft transition-all duration-300 group cursor-pointer h-full flex flex-col block ${className}`}
     >
       <div className="relative aspect-[4/3] overflow-hidden">
         <img
           alt={property.title}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-          src={property.image}
+          src={property.images[0]}
         />
         <button
           onClick={(e) => {
+            e.preventDefault();
             e.stopPropagation();
             onToggleFavorite(property.id);
           }}
@@ -78,6 +81,6 @@ export default function PropertyCard({
           </div>
         </div>
       </div>
-    </article>
+    </Link>
   );
 }

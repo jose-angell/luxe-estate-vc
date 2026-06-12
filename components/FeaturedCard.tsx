@@ -1,6 +1,7 @@
 "use client";
 
 import { Property } from "../data/mockProperties";
+import Link from "next/link";
 
 interface FeaturedCardProps {
   property: Property;
@@ -20,12 +21,12 @@ export default function FeaturedCard({
   }).format(property.price);
 
   return (
-    <div className="group relative rounded-xl overflow-hidden shadow-soft bg-white cursor-pointer transition-all duration-300">
+    <Link href={`/properties/${property.slug}`} className="group relative rounded-xl overflow-hidden shadow-soft bg-white cursor-pointer transition-all duration-300 block">
       <div className="aspect-[4/3] w-full overflow-hidden relative">
         <img
           alt={property.title}
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-          src={property.image}
+          src={property.images[0]}
         />
         {property.badge && (
           <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider text-nordic-dark">
@@ -34,6 +35,7 @@ export default function FeaturedCard({
         )}
         <button
           onClick={(e) => {
+            e.preventDefault();
             e.stopPropagation();
             onToggleFavorite(property.id);
           }}
@@ -72,6 +74,6 @@ export default function FeaturedCard({
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
