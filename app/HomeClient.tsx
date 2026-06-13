@@ -6,6 +6,7 @@ import Navbar from "../components/Navbar";
 import FeaturedCard from "../components/FeaturedCard";
 import PropertyCard from "../components/PropertyCard";
 import { Property } from "../data/mockProperties";
+import FilterModal from "../components/FilterModal";
 
 interface HomeClientProps {
   featuredProperties: Property[];
@@ -30,6 +31,10 @@ export default function HomeClient({ featuredProperties, marketProperties, total
   // New in Market sub-tab state (All, Buy, Rent)
   const [marketFilter, setMarketFilter] = useState("All");
 
+  // Filter Modal state
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [filterCriteria, setFilterCriteria] = useState<any>(null);
+
   // Favorites state (set of property IDs)
   const [favorites, setFavorites] = useState<string[]>([]);
 
@@ -41,36 +46,37 @@ export default function HomeClient({ featuredProperties, marketProperties, total
   };
 
   // Filter properties based on search query, category, and navigation tab
-  const filteredFeatured = featuredProperties.filter((p) => {
+  const applyFilters = (p: Property) => {
     if (searchQuery && !p.title.toLowerCase().includes(searchQuery.toLowerCase()) && !p.location.toLowerCase().includes(searchQuery.toLowerCase())) {
       return false;
     }
     if (activeCategory !== "All" && p.type !== activeCategory) {
       return false;
     }
-    if (activeNavTab === "Saved Homes") {
-      return favorites.includes(p.id);
-    }
     if (activeNavTab === "Buy" && p.status !== "FOR SALE") return false;
     if (activeNavTab === "Rent" && p.status !== "FOR RENT") return false;
+
+    if (filterCriteria) {
+      if (filterCriteria.location && !p.location.toLowerCase().includes(filterCriteria.location.toLowerCase())) return false;
+      if (filterCriteria.minPrice && p.price < parseInt(filterCriteria.minPrice)) return false;
+      if (filterCriteria.maxPrice && p.price > parseInt(filterCriteria.maxPrice)) return false;
+      if (filterCriteria.propertyType !== "Any Type" && p.type !== filterCriteria.propertyType) return false;
+      if (filterCriteria.bedrooms > 0 && p.beds < filterCriteria.bedrooms) return false;
+      if (filterCriteria.bathrooms > 0 && p.baths < filterCriteria.bathrooms) return false;
+    }
     return true;
+  };
+
+  const filteredFeatured = featuredProperties.filter((p) => {
+    if (activeNavTab === "Saved Homes") return favorites.includes(p.id);
+    return applyFilters(p);
   });
 
   const filteredMarket = marketProperties.filter((p) => {
-    if (searchQuery && !p.title.toLowerCase().includes(searchQuery.toLowerCase()) && !p.location.toLowerCase().includes(searchQuery.toLowerCase())) {
-      return false;
-    }
-    if (activeCategory !== "All" && p.type !== activeCategory) {
-      return false;
-    }
-    if (activeNavTab === "Saved Homes") {
-      return favorites.includes(p.id);
-    }
+    if (activeNavTab === "Saved Homes") return favorites.includes(p.id);
     if (marketFilter === "Buy" && p.status !== "FOR SALE") return false;
     if (marketFilter === "Rent" && p.status !== "FOR RENT") return false;
-    if (activeNavTab === "Buy" && p.status !== "FOR SALE") return false;
-    if (activeNavTab === "Rent" && p.status !== "FOR RENT") return false;
-    return true;
+    return applyFilters(p);
   });
 
   const totalPages = Math.ceil(totalCount / limit);
@@ -141,7 +147,10 @@ export default function HomeClient({ featuredProperties, marketProperties, total
                 );
               })}
               <div className="w-px h-6 bg-nordic-dark/10 mx-2"></div>
-              <button className="whitespace-nowrap flex items-center gap-1 px-4 py-2 rounded-full text-nordic-dark font-medium text-sm hover:bg-black/5 transition-colors">
+              <button 
+                onClick={() => setIsFilterModalOpen(true)}
+                className="whitespace-nowrap flex items-center gap-1 px-4 py-2 rounded-full text-nordic-dark font-medium text-sm hover:bg-black/5 transition-colors"
+              >
                 <span className="material-icons text-base">tune</span> Filters
               </button>
             </div>
@@ -253,6 +262,12 @@ export default function HomeClient({ featuredProperties, marketProperties, total
           )}
         </section>
       </main>
+
+      <FilterModal 
+        isOpen={isFilterModalOpen} 
+        onClose={() => setIsFilterModalOpen(false)} 
+        onApplyFilters={(filters) => setFilterCriteria(filters)} 
+      />
     </div>
   );
 }
