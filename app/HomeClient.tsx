@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Navbar from "../components/Navbar";
 import FeaturedCard from "../components/FeaturedCard";
@@ -22,11 +22,53 @@ export default function HomeClient({ featuredProperties, marketProperties, total
   // Navigation active tab (Navbar)
   const [activeNavTab, setActiveNavTab] = useState("Buy");
 
-  // Search query state
-  const [searchQuery, setSearchQuery] = useState("");
+  // URL Params
+  const searchParams = useSearchParams();
+  const initialCategory = searchParams.get("category") || "All";
+  const initialQuery = searchParams.get("q") || "";
 
   // Category filter state (All, House, Apartment, Villa, Penthouse)
-  const [activeCategory, setActiveCategory] = useState("All");
+  const [activeCategory, setActiveCategory] = useState(initialCategory);
+
+  // Search query state
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
+  const [searchInput, setSearchInput] = useState(initialQuery);
+
+  useEffect(() => {
+    setActiveCategory(searchParams.get("category") || "All");
+    setSearchQuery(searchParams.get("q") || "");
+    setSearchInput(searchParams.get("q") || "");
+  }, [searchParams]);
+
+  const handleCategoryClick = (cat: string) => {
+    setActiveCategory(cat);
+    const params = new URLSearchParams(searchParams.toString());
+    if (cat !== "All") {
+      params.set("category", cat);
+    } else {
+      params.delete("category");
+    }
+    params.set("page", "1");
+    router.push(`/?${params.toString()}`);
+  };
+
+  const handleSearchClick = () => {
+    setSearchQuery(searchInput);
+    const params = new URLSearchParams(searchParams.toString());
+    if (searchInput.trim()) {
+      params.set("q", searchInput.trim());
+    } else {
+      params.delete("q");
+    }
+    params.set("page", "1");
+    router.push(`/?${params.toString()}`);
+  };
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearchClick();
+    }
+  };
 
   // New in Market sub-tab state (All, Buy, Rent)
   const [marketFilter, setMarketFilter] = useState("All");
@@ -67,9 +109,12 @@ export default function HomeClient({ featuredProperties, marketProperties, total
     return true;
   };
 
+  const isFiltering = searchQuery.trim() !== "" || activeCategory !== "All" || filterCriteria !== null || (activeNavTab !== "Saved Homes" && marketFilter !== "All");
+  const showFeatured = !isFiltering && activeNavTab !== "Saved Homes";
+
   const filteredFeatured = featuredProperties.filter((p) => {
     if (activeNavTab === "Saved Homes") return favorites.includes(p.id);
-    return applyFilters(p);
+    return true; // We do not apply filters to featured properties, we just hide the entire section instead
   });
 
   const filteredMarket = marketProperties.filter((p) => {
@@ -120,11 +165,15 @@ export default function HomeClient({ featuredProperties, marketProperties, total
               <input
                 type="text"
                 placeholder="Search by city, neighborhood, or address..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                onKeyDown={handleSearchKeyDown}
                 className="block w-full pl-12 pr-28 py-4 rounded-xl border-none bg-white text-nordic-dark shadow-soft placeholder-nordic-muted/60 focus:ring-2 focus:ring-mosque focus:outline-none transition-all text-lg"
               />
-              <button className="absolute inset-y-2 right-2 px-6 bg-mosque hover:bg-mosque/90 text-white font-medium rounded-lg transition-colors flex items-center justify-center shadow-lg shadow-mosque/20">
+              <button 
+                onClick={handleSearchClick}
+                className="absolute inset-y-2 right-2 px-6 bg-mosque hover:bg-mosque/90 text-white font-medium rounded-lg transition-colors flex items-center justify-center shadow-lg shadow-mosque/20"
+              >
                 Search
               </button>
             </div>
@@ -135,7 +184,7 @@ export default function HomeClient({ featuredProperties, marketProperties, total
                 return (
                   <button
                     key={cat}
-                    onClick={() => setActiveCategory(cat)}
+                    onClick={() => handleCategoryClick(cat)}
                     className={`whitespace-nowrap px-5 py-2 rounded-full text-sm font-medium transition-all ${
                       isActive
                         ? "bg-nordic-dark text-white shadow-lg shadow-nordic-dark/10 -translate-y-0.5"
@@ -157,7 +206,7 @@ export default function HomeClient({ featuredProperties, marketProperties, total
           </div>
         </section>
 
-        {filteredFeatured.length > 0 && (
+        {showFeatured && filteredFeatured.length > 0 && (
           <section className="mb-16">
             <div className="flex items-end justify-between mb-8">
               <div>

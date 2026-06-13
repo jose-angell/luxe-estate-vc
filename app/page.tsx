@@ -5,27 +5,39 @@ import { Property } from '../data/mockProperties';
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; limit?: string }>;
+  searchParams: Promise<{ page?: string; limit?: string; category?: string; q?: string }>;
 }) {
   const params = await searchParams;
   const page = parseInt(params.page || '1', 10);
-  const limit = parseInt(params.limit || '4', 10);
+  const limit = parseInt(params.limit || '8', 10); // increased limit to 8 for better UX
+  const category = params.category || 'All';
+  const q = params.q || '';
   
   const start = (page - 1) * limit;
   const end = start + limit - 1;
 
-  // Fetch all featured properties for the top section (not paginated)
+  // Fetch all featured properties for the top section (limit to 2 as requested)
   const { data: featuredProperties } = await supabase
     .from('properties')
     .select('*')
-    .eq('isFeatured', true);
+    .eq('isFeatured', true)
+    .limit(2);
 
   // Fetch paginated market properties
-  const { data: marketProperties, count } = await supabase
+  let marketQuery = supabase
     .from('properties')
     .select('*', { count: 'exact' })
-    .eq('isFeatured', false)
-    .range(start, end);
+    .eq('isFeatured', false);
+
+  if (category !== 'All') {
+    marketQuery = marketQuery.eq('type', category);
+  }
+
+  if (q) {
+    marketQuery = marketQuery.or(`title.ilike.%${q}%,location.ilike.%${q}%`);
+  }
+
+  const { data: marketProperties, count } = await marketQuery.range(start, end);
 
   const mapProperty = (p: any): Property => ({
     ...p,
