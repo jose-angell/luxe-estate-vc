@@ -7,6 +7,7 @@ import FeaturedCard from "../components/FeaturedCard";
 import PropertyCard from "../components/PropertyCard";
 import { Property } from "../data/mockProperties";
 import FilterModal from "../components/FilterModal";
+import { useTranslation } from "../lib/i18n/LanguageContext";
 
 interface HomeClientProps {
   featuredProperties: Property[];
@@ -18,8 +19,9 @@ interface HomeClientProps {
 
 export default function HomeClient({ featuredProperties, marketProperties, totalCount, page, limit }: HomeClientProps) {
   const router = useRouter();
-  
-  // Navigation active tab (Navbar)
+  const { t } = useTranslation();
+
+  // Navigation active tab (Navbar) — uses internal key, not translated label
   const [activeNavTab, setActiveNavTab] = useState("Buy");
 
   // URL Params
@@ -138,7 +140,20 @@ export default function HomeClient({ featuredProperties, marketProperties, total
     }
   };
 
-  const categories = ["All", "House", "Apartment", "Villa", "Penthouse"];
+  // Categories use internal keys for filtering; labels are translated
+  const categories = [
+    { key: "All", label: t.categories.all },
+    { key: "House", label: t.categories.house },
+    { key: "Apartment", label: t.categories.apartment },
+    { key: "Villa", label: t.categories.villa },
+    { key: "Penthouse", label: t.categories.penthouse },
+  ];
+
+  const marketFilters = [
+    { key: "All", label: t.home.filterAll },
+    { key: "Buy", label: t.home.filterBuy },
+    { key: "Rent", label: t.home.filterRent },
+  ];
 
   return (
     <div className="min-h-screen bg-background-light font-display">
@@ -148,9 +163,9 @@ export default function HomeClient({ featuredProperties, marketProperties, total
         <section className="py-12 md:py-16">
           <div className="max-w-3xl mx-auto text-center space-y-8">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-light text-nordic-dark leading-tight">
-              Find your{" "}
+              {t.hero.title1}{" "}
               <span className="relative inline-block">
-                <span className="relative z-10 font-medium">sanctuary</span>
+                <span className="relative z-10 font-medium">{t.hero.titleHighlight}</span>
                 <span className="absolute bottom-2 left-0 w-full h-3 bg-mosque/20 -rotate-1 z-0"></span>
               </span>
               .
@@ -164,43 +179,43 @@ export default function HomeClient({ featuredProperties, marketProperties, total
               </div>
               <input
                 type="text"
-                placeholder="Search by city, neighborhood, or address..."
+                placeholder={t.hero.searchPlaceholder}
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 onKeyDown={handleSearchKeyDown}
                 className="block w-full pl-12 pr-28 py-4 rounded-xl border-none bg-white text-nordic-dark shadow-soft placeholder-nordic-muted/60 focus:ring-2 focus:ring-mosque focus:outline-none transition-all text-lg"
               />
-              <button 
+              <button
                 onClick={handleSearchClick}
                 className="absolute inset-y-2 right-2 px-6 bg-mosque hover:bg-mosque/90 text-white font-medium rounded-lg transition-colors flex items-center justify-center shadow-lg shadow-mosque/20"
               >
-                Search
+                {t.hero.searchButton}
               </button>
             </div>
 
             <div className="flex items-center justify-center gap-3 overflow-x-auto hide-scroll py-2 px-4 -mx-4">
               {categories.map((cat) => {
-                const isActive = activeCategory === cat;
+                const isActive = activeCategory === cat.key;
                 return (
                   <button
-                    key={cat}
-                    onClick={() => handleCategoryClick(cat)}
+                    key={cat.key}
+                    onClick={() => handleCategoryClick(cat.key)}
                     className={`whitespace-nowrap px-5 py-2 rounded-full text-sm font-medium transition-all ${
                       isActive
                         ? "bg-nordic-dark text-white shadow-lg shadow-nordic-dark/10 -translate-y-0.5"
                         : "bg-white border border-nordic-dark/5 text-nordic-muted hover:text-nordic-dark hover:border-mosque/50 hover:bg-mosque/5"
                     }`}
                   >
-                    {cat}
+                    {cat.label}
                   </button>
                 );
               })}
               <div className="w-px h-6 bg-nordic-dark/10 mx-2"></div>
-              <button 
+              <button
                 onClick={() => setIsFilterModalOpen(true)}
                 className="whitespace-nowrap flex items-center gap-1 px-4 py-2 rounded-full text-nordic-dark font-medium text-sm hover:bg-black/5 transition-colors"
               >
-                <span className="material-icons text-base">tune</span> Filters
+                <span className="material-icons text-base">tune</span> {t.categories.filters}
               </button>
             </div>
           </div>
@@ -210,8 +225,8 @@ export default function HomeClient({ featuredProperties, marketProperties, total
           <section className="mb-16">
             <div className="flex items-end justify-between mb-8">
               <div>
-                <h2 className="text-2xl font-light text-nordic-dark">Featured Collections</h2>
-                <p className="text-nordic-muted mt-1 text-sm">Curated properties for the discerning eye.</p>
+                <h2 className="text-2xl font-light text-nordic-dark">{t.home.featured}</h2>
+                <p className="text-nordic-muted mt-1 text-sm">{t.home.featuredSub}</p>
               </div>
             </div>
 
@@ -232,30 +247,30 @@ export default function HomeClient({ featuredProperties, marketProperties, total
           <div className="flex items-end justify-between mb-8">
             <div>
               <h2 className="text-2xl font-light text-nordic-dark">
-                {activeNavTab === "Saved Homes" ? "Saved Sanctuaries" : "New in Market"}
+                {activeNavTab === "Saved Homes" ? t.home.savedSanctuaries : t.home.newInMarket}
               </h2>
               <p className="text-nordic-muted mt-1 text-sm">
                 {activeNavTab === "Saved Homes"
-                  ? "Your personal selection of dream properties."
-                  : "Fresh opportunities added this week."}
+                  ? t.home.savedSub
+                  : t.home.newInMarketSub}
               </p>
             </div>
 
             {activeNavTab !== "Saved Homes" && (
               <div className="hidden md:flex bg-white p-1 rounded-lg border border-nordic-dark/5 shadow-sm">
-                {["All", "Buy", "Rent"].map((filterOpt) => {
-                  const isActive = marketFilter === filterOpt;
+                {marketFilters.map((filterOpt) => {
+                  const isActive = marketFilter === filterOpt.key;
                   return (
                     <button
-                      key={filterOpt}
-                      onClick={() => setMarketFilter(filterOpt)}
+                      key={filterOpt.key}
+                      onClick={() => setMarketFilter(filterOpt.key)}
                       className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
                         isActive
                           ? "bg-nordic-dark text-white shadow-sm"
                           : "text-nordic-muted hover:text-nordic-dark"
                       }`}
                     >
-                      {filterOpt}
+                      {filterOpt.label}
                     </button>
                   );
                 })}
@@ -284,17 +299,17 @@ export default function HomeClient({ featuredProperties, marketProperties, total
                   disabled={page === 1}
                   className="px-6 py-2 bg-white border border-nordic-dark/10 hover:border-mosque hover:text-mosque text-nordic-dark font-medium rounded-lg transition-all hover:shadow-md disabled:opacity-50"
                 >
-                  Previous
+                  {t.home.previous}
                 </button>
                 <span className="text-nordic-muted font-medium">
-                  Page {page} of {totalPages}
+                  {t.home.pageOf.replace("{page}", String(page)).replace("{total}", String(totalPages))}
                 </span>
                 <button
                   onClick={handleNextPage}
                   disabled={page >= totalPages}
                   className="px-6 py-2 bg-white border border-nordic-dark/10 hover:border-mosque hover:text-mosque text-nordic-dark font-medium rounded-lg transition-all hover:shadow-md disabled:opacity-50"
                 >
-                  Next
+                  {t.home.next}
                 </button>
               </div>
             </div>
@@ -303,19 +318,19 @@ export default function HomeClient({ featuredProperties, marketProperties, total
               <span className="material-icons text-4xl text-nordic-muted/40 mb-3">
                 gpp_maybe
               </span>
-              <h3 className="text-lg font-medium text-nordic-dark">No properties found</h3>
+              <h3 className="text-lg font-medium text-nordic-dark">{t.home.noProperties}</h3>
               <p className="text-sm text-nordic-muted mt-1">
-                Try modifying your filters or search terms.
+                {t.home.noPropertiesSub}
               </p>
             </div>
           )}
         </section>
       </main>
 
-      <FilterModal 
-        isOpen={isFilterModalOpen} 
-        onClose={() => setIsFilterModalOpen(false)} 
-        onApplyFilters={(filters) => setFilterCriteria(filters)} 
+      <FilterModal
+        isOpen={isFilterModalOpen}
+        onClose={() => setIsFilterModalOpen(false)}
+        onApplyFilters={(filters) => setFilterCriteria(filters)}
       />
     </div>
   );

@@ -2,6 +2,7 @@
 
 import { Property } from "../data/mockProperties";
 import Link from "next/link";
+import { useTranslation } from "../lib/i18n/LanguageContext";
 
 interface PropertyCardProps {
   property: Property;
@@ -16,7 +17,9 @@ export default function PropertyCard({
   onToggleFavorite,
   className = "",
 }: PropertyCardProps) {
-  const formattedPrice = new Intl.NumberFormat("en-US", {
+  const { t, locale } = useTranslation();
+
+  const formattedPrice = new Intl.NumberFormat(locale === "ja" ? "ja-JP" : locale === "es" ? "es-MX" : "en-US", {
     style: "currency",
     currency: "USD",
     maximumFractionDigits: 0,
@@ -58,7 +61,7 @@ export default function PropertyCard({
           <h3 className="font-bold text-lg text-nordic-dark">
             {formattedPrice}
             {property.pricePerMonth && (
-              <span className="text-sm font-normal text-nordic-muted">/mo</span>
+              <span className="text-sm font-normal text-nordic-muted">{t.property.perMonth}</span>
             )}
           </h3>
         </div>

@@ -2,6 +2,7 @@
 
 import { Property } from "../data/mockProperties";
 import Link from "next/link";
+import { useTranslation } from "../lib/i18n/LanguageContext";
 
 interface FeaturedCardProps {
   property: Property;
@@ -14,7 +15,9 @@ export default function FeaturedCard({
   isFavorite,
   onToggleFavorite,
 }: FeaturedCardProps) {
-  const formattedPrice = new Intl.NumberFormat("en-US", {
+  const { t, locale } = useTranslation();
+
+  const formattedPrice = new Intl.NumberFormat(locale === "ja" ? "ja-JP" : locale === "es" ? "es-MX" : "en-US", {
     style: "currency",
     currency: "USD",
     maximumFractionDigits: 0,
@@ -59,15 +62,15 @@ export default function FeaturedCard({
           </div>
           <span className="text-xl font-semibold text-mosque">
             {formattedPrice}
-            {property.pricePerMonth && <span className="text-sm font-normal text-nordic-muted">/mo</span>}
+            {property.pricePerMonth && <span className="text-sm font-normal text-nordic-muted">{t.property.perMonth}</span>}
           </span>
         </div>
         <div className="flex items-center gap-6 mt-6 pt-6 border-t border-nordic-dark/5">
           <div className="flex items-center gap-2 text-nordic-muted text-sm">
-            <span className="material-icons text-lg">king_bed</span> {property.beds} Beds
+            <span className="material-icons text-lg">king_bed</span> {property.beds} {t.property.beds}
           </div>
           <div className="flex items-center gap-2 text-nordic-muted text-sm">
-            <span className="material-icons text-lg">bathtub</span> {property.baths} Baths
+            <span className="material-icons text-lg">bathtub</span> {property.baths} {t.property.baths}
           </div>
           <div className="flex items-center gap-2 text-nordic-muted text-sm">
             <span className="material-icons text-lg">square_foot</span> {property.area.toLocaleString()} m²

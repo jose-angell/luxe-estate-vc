@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useTranslation } from "../lib/i18n/LanguageContext";
+import LanguageSelector from "./LanguageSelector";
 
 interface NavbarProps {
   activeTab?: string;
@@ -10,7 +12,14 @@ interface NavbarProps {
 
 export default function Navbar({ activeTab = "Buy", onTabChange }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const tabs = ["Buy", "Rent", "Sell", "Saved Homes"];
+  const { t } = useTranslation();
+
+  const tabs = [
+    { key: "Buy", label: t.nav.buy },
+    { key: "Rent", label: t.nav.rent },
+    { key: "Sell", label: t.nav.sell },
+    { key: "Saved Homes", label: t.nav.savedHomes },
+  ];
 
   return (
     <nav className="sticky top-0 z-50 bg-background-light/95 backdrop-blur-md border-b border-nordic-dark/10">
@@ -29,25 +38,25 @@ export default function Navbar({ activeTab = "Buy", onTabChange }: NavbarProps) 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             {tabs.map((tab) => {
-              const isActive = activeTab === tab;
+              const isActive = activeTab === tab.key;
               return (
                 <button
-                  key={tab}
-                  onClick={() => onTabChange?.(tab)}
+                  key={tab.key}
+                  onClick={() => onTabChange?.(tab.key)}
                   className={`font-medium text-sm px-1 py-1 transition-all ${
                     isActive
                       ? "text-mosque border-b-2 border-mosque"
                       : "text-nordic-dark/70 hover:text-nordic-dark hover:border-b-2 hover:border-nordic-dark/20"
                   }`}
                 >
-                  {tab}
+                  {tab.label}
                 </button>
               );
             })}
           </div>
 
           {/* User Operations */}
-          <div className="flex items-center space-x-4 md:space-x-6">
+          <div className="flex items-center space-x-2 md:space-x-4">
             <button className="text-nordic-dark hover:text-mosque transition-colors">
               <span className="material-icons">search</span>
             </button>
@@ -55,6 +64,9 @@ export default function Navbar({ activeTab = "Buy", onTabChange }: NavbarProps) 
               <span className="material-icons">notifications_none</span>
               <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-background-light"></span>
             </button>
+
+            {/* Language Selector */}
+            <LanguageSelector />
 
             {/* Profile */}
             <div className="flex items-center gap-2 pl-2 border-l border-nordic-dark/10 ml-2">
@@ -83,17 +95,17 @@ export default function Navbar({ activeTab = "Buy", onTabChange }: NavbarProps) 
       {/* Mobile Navigation Panel */}
       <div
         className={`md:hidden border-t border-nordic-dark/5 bg-background-light overflow-hidden transition-all duration-300 ${
-          isMobileMenuOpen ? "max-h-60 opacity-100" : "max-h-0 opacity-0 pointer-events-none"
+          isMobileMenuOpen ? "max-h-72 opacity-100" : "max-h-0 opacity-0 pointer-events-none"
         }`}
       >
         <div className="px-4 py-2 space-y-1">
           {tabs.map((tab) => {
-            const isActive = activeTab === tab;
+            const isActive = activeTab === tab.key;
             return (
               <button
-                key={tab}
+                key={tab.key}
                 onClick={() => {
-                  onTabChange?.(tab);
+                  onTabChange?.(tab.key);
                   setIsMobileMenuOpen(false);
                 }}
                 className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium transition-all ${
@@ -102,10 +114,14 @@ export default function Navbar({ activeTab = "Buy", onTabChange }: NavbarProps) 
                     : "text-nordic-dark hover:bg-black/5"
                 }`}
               >
-                {tab}
+                {tab.label}
               </button>
             );
           })}
+          {/* Mobile language selector */}
+          <div className="px-3 py-2 border-t border-nordic-dark/5 mt-2 pt-3">
+            <LanguageSelector />
+          </div>
         </div>
       </div>
     </nav>
