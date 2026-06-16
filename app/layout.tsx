@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { LanguageProvider } from "../lib/i18n/LanguageContext";
+import { AuthProvider } from "../lib/auth/AuthContext";
 import { cookies } from "next/headers";
 import { Locale, SUPPORTED_LOCALES, DEFAULT_LOCALE } from "../lib/i18n/types";
 
@@ -32,9 +33,11 @@ export default async function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
       </head>
       <body className="min-h-full flex flex-col bg-background-light text-nordic-dark font-display">
-        <LanguageProvider initialLocale={initialLocale}>
-          {children}
-        </LanguageProvider>
+        <AuthProvider>
+          <LanguageProvider initialLocale={initialLocale}>
+            {children}
+          </LanguageProvider>
+        </AuthProvider>
       </body>
     </html>
   );

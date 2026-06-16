@@ -10,6 +10,8 @@ export interface Translations {
     rent: string;
     sell: string;
     savedHomes: string;
+    signIn: string;
+    signOut: string;
   };
   hero: {
     title1: string;

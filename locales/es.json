@@ -3,7 +3,9 @@
     "buy": "Comprar",
     "rent": "Rentar",
     "sell": "Vender",
-    "savedHomes": "Mis Favoritos"
+    "savedHomes": "Mis Favoritos",
+    "signIn": "Iniciar Sesión",
+    "signOut": "Cerrar Sesión"
   },
   "hero": {
     "title1": "Encuentra tu",

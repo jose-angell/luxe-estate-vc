@@ -3,7 +3,9 @@
     "buy": "購入",
     "rent": "賃貸",
     "sell": "売却",
-    "savedHomes": "お気に入り"
+    "savedHomes": "お気に入り",
+    "signIn": "サインイン",
+    "signOut": "サインアウト"
   },
   "hero": {
     "title1": "あなたの",
