@@ -26,7 +26,7 @@ export default function LoginClient() {
   };
 
   return (
-    <body className="font-display bg-background-light min-h-screen flex items-center justify-center p-4 antialiased text-nordic-dark relative overflow-hidden">
+    <div className="font-display bg-background-light min-h-screen flex items-center justify-center p-4 antialiased text-nordic-dark relative overflow-hidden">
       {/* Ambient blobs */}
       <div className="absolute inset-0 pointer-events-none opacity-40">
         <div className="absolute -top-24 -right-24 w-96 h-96 bg-hint-green/30 rounded-full blur-3xl" />
@@ -196,6 +196,6 @@ export default function LoginClient() {
           </nav>
         </div>
       </main>
-    </body>
+    </div>
   );
 }
