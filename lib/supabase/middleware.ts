@@ -25,19 +25,8 @@ export async function updateProxy(request: NextRequest) {
     }
   );
 
-  // IMPORTANT: Do not add any logic between createServerClient and getUser()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  // Protect /admin routes — only requires authentication
-  if (request.nextUrl.pathname.startsWith("/admin")) {
-    if (!user) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/login";
-      return NextResponse.redirect(url);
-    }
-  }
+  // Refresh session cookie if needed — no route restrictions applied here
+  await supabase.auth.getUser();
 
   return supabaseResponse;
 }
