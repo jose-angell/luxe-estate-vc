@@ -47,7 +47,8 @@ export default function AdminNav({ user }: AdminNavProps) {
     };
 
     const getProfileInitial = () => {
-        return user?.email ? user.email.charAt(0).toUpperCase() : 'U';
+        const displayName = user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email;
+        return displayName ? displayName.charAt(0).toUpperCase() : 'U';
     };
 
     const avatarUrl =
@@ -95,11 +96,11 @@ export default function AdminNav({ user }: AdminNavProps) {
                         className="flex items-center gap-3 pl-4 border-l border-nordic/10 relative"
                         ref={dropdownRef}
                     >
-                        <div className="hidden sm:flex flex-col items-end">
+                        <div className="flex flex-col items-end">
                             <span className="text-sm font-semibold text-nordic">
-                                {user?.email}
+                                {user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email}
                             </span>
-                            <span className="text-xs text-nordic/60">Administrator</span>
+                            <span className="text-xs text-nordic/60">Administrador</span>
                         </div>
 
                         <button
@@ -110,11 +111,10 @@ export default function AdminNav({ user }: AdminNavProps) {
                         >
                             {avatarUrl ? (
                                 <div className="h-8 w-8 rounded-full flex items-center justify-center overflow-hidden border border-nordic/10 relative">
-                                    <Image
+                                    <img
                                         src={avatarUrl}
                                         alt={user?.email || 'Admin'}
-                                        fill
-                                        className="object-cover"
+                                        className="h-full w-full object-cover"
                                     />
                                 </div>
                             ) : (
@@ -129,8 +129,17 @@ export default function AdminNav({ user }: AdminNavProps) {
                         {/* Dropdown Menu */}
                         {isDropdownOpen && (
                             <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 border border-nordic/10 z-50">
+                                <div className="px-4 py-2 border-b border-nordic/5 mb-1">
+                                    <p className="text-[10px] uppercase tracking-wider text-nordic/60 font-semibold">Conectado como</p>
+                                    <p className="text-xs font-semibold text-nordic truncate">
+                                        {user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email}
+                                    </p>
+                                </div>
                                 <button
-                                    onClick={handleLogout}
+                                    onClick={() => {
+                                        handleLogout();
+                                        setIsDropdownOpen(false);
+                                    }}
                                     className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors"
                                 >
                                     <span className="material-icons text-sm">logout</span>
