@@ -83,9 +83,9 @@ export default async function AdminPropertiesPage(props: {
           <button className="bg-white border border-nordic/10 text-nordic hover:bg-gray-50 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm inline-flex items-center gap-2">
             <span className="material-icons text-base">filter_list</span> Filter
           </button>
-          <button className="bg-mosque hover:bg-mosque/90 text-white px-5 py-2.5 rounded-lg text-sm font-medium shadow-md shadow-mosque/20 transition-all transform hover:-translate-y-0.5 inline-flex items-center gap-2">
+          <Link href="/admin/properties/create" className="bg-mosque hover:bg-mosque/90 text-white px-5 py-2.5 rounded-lg text-sm font-medium shadow-md shadow-mosque/20 transition-all transform hover:-translate-y-0.5 inline-flex items-center gap-2">
             <span className="material-icons text-base">add</span> Add New Property
-          </button>
+          </Link>
         </div>
       </div>
 
@@ -192,7 +192,7 @@ export default async function AdminPropertiesPage(props: {
             {/* Actions */}
             <div className="col-span-12 md:col-span-2 flex items-center justify-end gap-2">
               <Link
-                href={`/properties/${property.slug}`}
+                href={`/admin/properties/${property.slug}/edit`}
                 className="p-2 rounded-lg text-nordic/40 hover:text-mosque hover:bg-hint-of-green/30 transition-all"
                 title="Edit Property"
               >
