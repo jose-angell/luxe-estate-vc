@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
+import { togglePropertyStatus } from '@/app/actions/properties';
 
 type Property = {
   id: string;
@@ -16,6 +17,7 @@ type Property = {
   badge: string | null;
   isFeatured: boolean | null;
   images: string[] | null;
+  isActive?: boolean;
 };
 
 export default async function AdminPropertiesPage(props: {
@@ -43,17 +45,25 @@ export default async function AdminPropertiesPage(props: {
 
   const { data: allProperties } = await supabase
     .from('properties')
-    .select('isFeatured, status');
+    .select('isFeatured, status, isActive');
 
   if (error) {
     return <div className="p-8 text-red-500">Error loading properties: {error.message}</div>;
   }
 
   const activeCount =
-    allProperties?.filter((p) => p.status === 'FOR SALE' || p.status === 'FOR RENT')?.length || 0;
+    allProperties?.filter((p) => (p.status === 'FOR SALE' || p.status === 'FOR RENT') && p.isActive !== false)?.length || 0;
   const featuredCount = allProperties?.filter((p) => p.isFeatured)?.length || 0;
 
   const getStatusBadge = (property: Property) => {
+    if (property.isActive === false) {
+      return (
+        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700 border border-red-200">
+          <span className="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5"></span>
+          Deactivated
+        </span>
+      );
+    }
     const isActive = property.status === 'FOR SALE' || property.status === 'FOR RENT';
     if (isActive) {
       return (
@@ -198,12 +208,17 @@ export default async function AdminPropertiesPage(props: {
               >
                 <span className="material-icons text-xl">edit</span>
               </Link>
-              <button
-                className="p-2 rounded-lg text-nordic/40 hover:text-red-600 hover:bg-red-50 transition-all"
-                title="Delete Property"
-              >
-                <span className="material-icons text-xl">delete_outline</span>
-              </button>
+              <form action={togglePropertyStatus.bind(null, property.id, property.isActive === false ? true : false)}>
+                <button
+                  type="submit"
+                  className={`p-2 rounded-lg transition-all ${property.isActive === false ? 'text-green-600 hover:bg-green-50' : 'text-nordic/40 hover:text-red-600 hover:bg-red-50'}`}
+                  title={property.isActive === false ? "Activate Property" : "Deactivate Property"}
+                >
+                  <span className="material-icons text-xl">
+                    {property.isActive === false ? 'visibility' : 'visibility_off'}
+                  </span>
+                </button>
+              </form>
             </div>
           </div>
         ))}

@@ -24,6 +24,7 @@ export interface PropertyPayload {
   amenities?: string[];
   latitude?: number | null;
   longitude?: number | null;
+  isActive?: boolean;
 }
 
 export async function saveProperty(
@@ -50,5 +51,22 @@ export async function saveProperty(
   }
 
   revalidatePath("/admin/properties");
+  return { success: true };
+}
+
+export async function togglePropertyStatus(
+  id: string,
+  isActive: boolean
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = await createAdminClient();
+  const { error } = await supabase
+    .from("properties")
+    .update({ isActive })
+    .eq("id", id);
+    
+  if (error) return { success: false, error: error.message };
+  
+  revalidatePath("/admin/properties");
+  revalidatePath("/");
   return { success: true };
 }

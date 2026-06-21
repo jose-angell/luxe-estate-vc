@@ -21,13 +21,15 @@ export default async function Page({
     .from('properties')
     .select('*')
     .eq('isFeatured', true)
+    .eq('isActive', true)
     .limit(2);
 
   // Fetch paginated market properties
   let marketQuery = supabase
     .from('properties')
     .select('*', { count: 'exact' })
-    .eq('isFeatured', false);
+    .eq('isFeatured', false)
+    .eq('isActive', true);
 
   if (category !== 'All') {
     marketQuery = marketQuery.eq('type', category);

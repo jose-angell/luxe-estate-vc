@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: PageProps) {
   let property = mockProperties.find(p => p.slug === slug || p.id === slug);
   
   if (!property) {
-    const { data } = await supabase.from('properties').select('*').or(`slug.eq.${slug},id.eq.${slug}`).single();
+    const { data } = await supabase.from('properties').select('*').or(`slug.eq.${slug},id.eq.${slug}`).eq('isActive', true).single();
     if (data) {
       property = { ...data, slug: data.slug || data.id, images: data.images || [] } as Property;
     }
@@ -32,7 +32,7 @@ export default async function PropertyPage({ params }: PageProps) {
   let property = mockProperties.find(p => p.slug === slug || p.id === slug);
 
   if (!property) {
-    const { data } = await supabase.from('properties').select('*').or(`slug.eq.${slug},id.eq.${slug}`).single();
+    const { data } = await supabase.from('properties').select('*').or(`slug.eq.${slug},id.eq.${slug}`).eq('isActive', true).single();
     if (data) {
       property = { ...data, slug: data.slug || data.id, images: data.images || [] } as Property;
     }
