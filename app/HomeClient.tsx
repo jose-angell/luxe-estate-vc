@@ -15,9 +15,10 @@ interface HomeClientProps {
   totalCount: number;
   page: number;
   limit: number;
+  initialQ?: string;
 }
 
-export default function HomeClient({ featuredProperties, marketProperties, totalCount, page, limit }: HomeClientProps) {
+export default function HomeClient({ featuredProperties, marketProperties, totalCount, page, limit, initialQ = '' }: HomeClientProps) {
   const router = useRouter();
   const { t } = useTranslation();
 
@@ -89,11 +90,9 @@ export default function HomeClient({ featuredProperties, marketProperties, total
     );
   };
 
-  // Filter properties based on search query, category, and navigation tab
+  // The server already filters by title (via ilike). Here we only apply
+  // client-side filters that are NOT sent to the server (navTab, marketFilter, filterCriteria).
   const applyFilters = (p: Property) => {
-    if (searchQuery && !p.title.toLowerCase().includes(searchQuery.toLowerCase()) && !p.location.toLowerCase().includes(searchQuery.toLowerCase())) {
-      return false;
-    }
     if (activeCategory !== "All" && p.type !== activeCategory) {
       return false;
     }
@@ -111,7 +110,7 @@ export default function HomeClient({ featuredProperties, marketProperties, total
     return true;
   };
 
-  const isFiltering = searchQuery.trim() !== "" || activeCategory !== "All" || filterCriteria !== null || (activeNavTab !== "Saved Homes" && marketFilter !== "All");
+  const isFiltering = initialQ.trim() !== "" || searchQuery.trim() !== "" || activeCategory !== "All" || filterCriteria !== null || (activeNavTab !== "Saved Homes" && marketFilter !== "All");
   const showFeatured = !isFiltering && activeNavTab !== "Saved Homes";
 
   const filteredFeatured = featuredProperties.filter((p) => {

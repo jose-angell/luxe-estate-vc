@@ -1,3 +1,4 @@
+import { connection } from 'next/server';
 import { supabase } from '../lib/supabase';
 import HomeClient from './HomeClient';
 import { Property } from '../data/mockProperties';
@@ -7,9 +8,10 @@ export default async function Page({
 }: {
   searchParams: Promise<{ page?: string; limit?: string; category?: string; q?: string }>;
 }) {
+  await connection(); // force dynamic render so searchParams are always fresh
   const params = await searchParams;
   const page = parseInt(params.page || '1', 10);
-  const limit = parseInt(params.limit || '8', 10); // increased limit to 8 for better UX
+  const limit = parseInt(params.limit || '8', 10);
   const category = params.category || 'All';
   const q = params.q || '';
   
@@ -28,15 +30,20 @@ export default async function Page({
   let marketQuery = supabase
     .from('properties')
     .select('*', { count: 'exact' })
-    .eq('isFeatured', false)
     .eq('isActive', true);
+
+  const isFiltering = category !== 'All' || q !== '';
+  if (!isFiltering) {
+    marketQuery = marketQuery.eq('isFeatured', false);
+  }
 
   if (category !== 'All') {
     marketQuery = marketQuery.eq('type', category);
   }
 
   if (q) {
-    marketQuery = marketQuery.or(`title.ilike.%${q}%,location.ilike.%${q}%`);
+    // ILIKE is natively case-insensitive in Postgres — no need to lowercase
+    marketQuery = marketQuery.ilike('title', `%${q}%`);
   }
 
   const { data: marketProperties, count } = await marketQuery.range(start, end);
@@ -57,6 +64,7 @@ export default async function Page({
       totalCount={count || 0}
       page={page}
       limit={limit}
+      initialQ={q}
     />
   );
 }
