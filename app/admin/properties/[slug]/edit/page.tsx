@@ -45,6 +45,8 @@ export default async function EditPropertyPage(props: {
     yearBuilt: property.yearBuilt ?? "",
     parking: property.parking ?? 0,
     amenities: property.amenities ?? [],
+    latitude: property.latitude ?? "",
+    longitude: property.longitude ?? "",
   };
 
   return (
