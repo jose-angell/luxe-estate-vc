@@ -4,6 +4,16 @@ import React, { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { saveProperty } from "@/app/actions/properties";
+import dynamic from "next/dynamic";
+
+const MapPreview = dynamic(() => import("./MapPreview"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
+      <span className="material-icons animate-spin">refresh</span>
+    </div>
+  ),
+});
 
 export interface PropertyData {
   id?: string;
@@ -580,20 +590,26 @@ export default function PropertyForm({ initialData }: PropertyFormProps) {
                 </div>
               </div>
               <div className="relative h-48 w-full rounded-lg overflow-hidden bg-gray-100 border border-gray-200 group">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuAS55FY7gfArnlTpNsdabJk9nBO5uQJgOwIsl8beO34JRZ9dMmjLoIkTuTUO72Y9L5tUmQqTReQWebUWadAWwLusGmRQiIict5sqY--yRaOxuYpTzfR4vv4RKh1ex6oxY64e0kbSeMudNO6pv-gG0WzVWs-pDfvQm5IoTQ1mT-tAV49LDkXAHZl317M1-D7eZw3N8o2ExKWTgg6oMAXOFVnkApIqnb7TZHekwSw8pWQxpJV2EKI8EQKQbQXJaSbjN8gB1n8b-ueWj8"
-                  alt="Map preview"
-                  className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-500"
-                />
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <span className="bg-white/90 text-[var(--color-nordic-dark)] px-3 py-1.5 rounded shadow-sm backdrop-blur-sm text-xs font-bold font-sf flex items-center gap-1">
-                    <span className="material-icons text-sm text-[var(--color-mosque)]">
-                      map
-                    </span>{" "}
-                    Preview
-                  </span>
-                </div>
+                {formData.latitude !== "" && formData.latitude != null && formData.longitude !== "" && formData.longitude != null && !isNaN(Number(formData.latitude)) && !isNaN(Number(formData.longitude)) ? (
+                  <MapPreview latitude={Number(formData.latitude)} longitude={Number(formData.longitude)} />
+                ) : (
+                  <>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuAS55FY7gfArnlTpNsdabJk9nBO5uQJgOwIsl8beO34JRZ9dMmjLoIkTuTUO72Y9L5tUmQqTReQWebUWadAWwLusGmRQiIict5sqY--yRaOxuYpTzfR4vv4RKh1ex6oxY64e0kbSeMudNO6pv-gG0WzVWs-pDfvQm5IoTQ1mT-tAV49LDkXAHZl317M1-D7eZw3N8o2ExKWTgg6oMAXOFVnkApIqnb7TZHekwSw8pWQxpJV2EKI8EQKQbQXJaSbjN8gB1n8b-ueWj8"
+                      alt="Map preview"
+                      className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-500"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <span className="bg-white/90 text-[var(--color-nordic-dark)] px-3 py-1.5 rounded shadow-sm backdrop-blur-sm text-xs font-bold font-sf flex items-center gap-1">
+                        <span className="material-icons text-sm text-[var(--color-mosque)]">
+                          map
+                        </span>{" "}
+                        Preview
+                      </span>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>
